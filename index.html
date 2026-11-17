@@ -3,97 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#102344">
-<title>SOB Staff Strength Planner</title>
+<meta name="theme-color" content="#142b4d">
+<title>Staff Strength &amp; Daily Roster</title>
 <style>
 :root {
-  --page:#f3f6fb;
+  color-scheme: light;
+  --page:#f4f6fa;
   --surface:#fff;
-  --ink:#17243a;
-  --muted:#6c7890;
-  --line:#e3e9f2;
-  --navy:#102344;
-  --blue:#285de8;
-  --blue-soft:#edf3ff;
-  --green:#13834d;
-  --green-soft:#eaf7ef;
-  --amber:#9a6100;
-  --amber-soft:#fff5df;
-  --red:#bd3c3c;
-  --red-soft:#fff0ee;
-  --shadow:0 8px 28px rgba(24,42,75,.055);
+  --ink:#18263b;
+  --muted:#718096;
+  --line:#e5eaf1;
+  --navy:#142b4d;
+  --blue:#315fe8;
+  --blue-soft:#eef3ff;
+  --green:#176b46;
+  --green-soft:#edf8f1;
+  --amber:#865800;
+  --amber-soft:#fff6e4;
+  --shadow:0 12px 36px rgba(24,42,75,.06);
 }
-* {box-sizing:border-box;font-family:Arimo,Arial,sans-serif}
-body {margin:0;padding:26px 18px 18px;background:var(--page);color:var(--ink)}
+* {box-sizing:border-box;font-family:Manrope,Arial,sans-serif}
+body {margin:0;padding:30px 18px;background:var(--page);color:var(--ink);-webkit-font-smoothing:antialiased}
 button,input {font:inherit}
-button:focus-visible,input:focus-visible {outline:3px solid rgba(40,93,232,.25);outline-offset:2px}
-.container {max-width:1100px;margin:0 auto}
-.header {position:relative;overflow:hidden;background:linear-gradient(125deg,#102344,#1c3c70);color:#fff;padding:28px 30px;border-radius:18px;margin-bottom:18px;box-shadow:var(--shadow)}
-.header:after {content:"";position:absolute;width:240px;height:240px;border:1px solid rgba(255,255,255,.11);border-radius:50%;right:-55px;top:-125px;box-shadow:0 0 0 28px rgba(255,255,255,.035),0 0 0 58px rgba(255,255,255,.025)}
-.eyebrow {margin:0 0 8px;color:#b9c9e5;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
-.header h1 {position:relative;z-index:1;margin:0 0 7px;font-size:25px;letter-spacing:.1px}
-.header p:last-child {position:relative;z-index:1;margin:0;color:#d1dcee;font-size:14px}
-.card {background:var(--surface);padding:21px;border:1px solid var(--line);border-radius:15px;margin-bottom:16px;box-shadow:var(--shadow)}
-.section-heading {display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
-.section-number {display:grid;place-items:center;flex:0 0 31px;height:31px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-size:12px;font-weight:800}
-h2 {margin:1px 0 4px;font-size:17px}
-.section-heading p,.help-text {margin:0;color:var(--muted);font-size:12px;line-height:1.5}
-.inputs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
-.field label {display:block;margin-bottom:7px;color:#53617a;font-size:12px;font-weight:700}
-.field input {width:100%;height:48px;padding:0 13px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:18px;font-weight:700;transition:border-color .15s,box-shadow .15s}
-.field input:focus {border-color:var(--blue);box-shadow:0 0 0 3px rgba(40,93,232,.09);outline:0}
-.input-note {margin:7px 0 0;color:var(--muted);font-size:11px}
-.stats {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
-.stat {min-width:0;padding:16px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe}
-.stat .value {display:block;margin-bottom:5px;font-size:27px;font-weight:800;line-height:1.1;letter-spacing:-.5px}
-.stat .label {display:block;color:var(--muted);font-size:11px;line-height:1.4}
-.stat.total .value {color:var(--ink)}
-.stat.absent .value {color:var(--red)}
-.stat.available .value,.stat.covered .value {color:var(--green)}
-.status {display:flex;align-items:flex-start;gap:10px;margin-top:13px;padding:13px 14px;border-radius:10px;background:var(--green-soft);color:#17633c;font-size:13px;font-weight:700;line-height:1.5}
-.status.warning {background:var(--amber-soft);color:var(--amber)}
-.status.error {background:var(--red-soft);color:var(--red)}
-.status-icon {flex:0 0 auto;font-size:15px}
-.toolbar {margin-bottom:16px}
-.heading-inline {display:flex;align-items:flex-start;gap:12px}
-.heading-inline h2 {margin:1px 0 4px}
-.shift {overflow:hidden;margin-top:12px;border:1px solid var(--line);border-radius:12px}
-.shift-head {padding:13px 15px;background:#f7f9fc}
-.shift-title {font-size:13px;font-weight:800;letter-spacing:.15px}
-.shift-time {display:block;margin-top:4px;color:var(--muted);font-size:11px;font-weight:400}
-.location-list {display:flex;flex-wrap:wrap;gap:8px;padding:13px 15px}
-.location {padding:8px 11px;border:1px solid #d9eee1;border-radius:8px;background:#f3fbf5;color:#17633c;font-size:13px;font-weight:700}
-.not-staffed {margin-top:16px;padding:14px;border:1px solid #f0dfb9;border-radius:10px;background:var(--amber-soft);color:#76500c;font-size:13px;line-height:1.6}
-.not-staffed strong {display:block;margin-bottom:5px}
-button {border:0;border-radius:8px;padding:10px 13px;font-weight:700;cursor:pointer;transition:background .15s,color .15s,transform .15s}
+button:focus-visible,input:focus-visible {outline:3px solid rgba(49,95,232,.25);outline-offset:2px}
+.container {width:min(100%,900px);margin:0 auto}
+.header {position:relative;overflow:hidden;padding:30px 32px;border-radius:20px;background:linear-gradient(125deg,#142b4d,#234779);color:#fff;box-shadow:var(--shadow)}
+.header:after {content:"";position:absolute;width:230px;height:230px;right:-65px;top:-145px;border:1px solid rgba(255,255,255,.13);border-radius:50%;box-shadow:0 0 0 28px rgba(255,255,255,.035),0 0 0 58px rgba(255,255,255,.025)}
+.eyebrow {position:relative;z-index:1;margin:0 0 8px;color:#bfd0ea;font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+h1 {position:relative;z-index:1;margin:0 0 8px;font-size:clamp(23px,4vw,30px);letter-spacing:-.7px}
+.header p:last-child {position:relative;z-index:1;margin:0;color:#d6e0ef;font-size:14px;line-height:1.6}
+.card {margin-top:16px;padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}
+.card-heading {margin:0 0 5px;font-size:17px;letter-spacing:-.2px}
+.card-description {margin:0;color:var(--muted);font-size:12px;line-height:1.55}
+.inputs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:18px}
+.field label {display:block;margin-bottom:7px;color:#52617a;font-size:12px;font-weight:750}
+.field input {width:100%;height:49px;padding:0 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:18px;font-weight:750;transition:border-color .15s,box-shadow .15s}
+.field input:focus {border-color:var(--blue);box-shadow:0 0 0 3px rgba(49,95,232,.09);outline:0}
+.availability {display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:17px;padding:15px 17px;border-radius:12px;background:var(--blue-soft)}
+.availability-label {color:#425477;font-size:13px;font-weight:700}
+.availability-value {color:var(--blue);font-size:27px;font-weight:850;letter-spacing:-.8px;white-space:nowrap}
+.roster-heading {display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px}
+.shifts {display:grid;gap:11px}
+.shift {overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#fff}
+.shift-header {display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:12px 15px;background:#f8f9fc}
+.shift-name {font-size:12px;font-weight:850;letter-spacing:.35px}
+.shift-time {color:var(--muted);font-size:11px;white-space:nowrap}
+.location-list {margin:0;padding:0 15px;list-style:none}
+.location-list li {padding:10px 0;border-top:1px solid #f0f2f6;color:#34445d;font-size:13px;font-weight:600}
+.location-list li:first-child {border-top:0}
+.empty-shift {margin:0;padding:12px 15px;border-top:1px solid #f0f2f6;color:var(--muted);font-size:12px}
+.notice {margin-top:14px;padding:14px 15px;border-radius:11px;background:var(--green-soft);color:var(--green);font-size:13px;line-height:1.55}
+.notice.warning {background:var(--amber-soft);color:var(--amber)}
+.notice strong {display:block;margin-bottom:5px}
+.notice ul {margin:5px 0 0;padding-left:20px}
+.notice li {padding:2px 0}
+.roster-actions {display:flex;justify-content:flex-end;margin-top:15px}
+button {padding:10px 14px;border:0;border-radius:9px;background:var(--navy);color:#fff;font-weight:750;cursor:pointer;transition:background .15s,transform .15s}
+button:hover {background:#234779}
 button:active {transform:translateY(1px)}
-.actions {display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
-button.primary {background:var(--blue);color:#fff}
-button.primary:hover {background:#194bc9}
-.footer {padding:9px 10px 5px;color:var(--muted);font-size:10px;text-align:center;letter-spacing:.45px}
-@media(max-width:700px) {
- body {padding:12px 10px}
- .header {padding:23px 20px;border-radius:14px}
- .header h1 {font-size:21px}
- .card {padding:16px;border-radius:13px}
- .stats {grid-template-columns:repeat(2,minmax(0,1fr))}
+.footer {padding:17px 8px 2px;color:var(--muted);font-size:10px;text-align:center;letter-spacing:.6px}
+@media(max-width:600px) {
+  body {padding:13px 10px}
+  .header {padding:23px 20px;border-radius:16px}
+  .card {padding:17px;border-radius:14px}
+  .inputs {gap:9px}
+  .field label {min-height:30px;font-size:11px;line-height:1.35}
+  .field input {height:45px;padding:0 9px;font-size:16px}
+  .roster-heading {align-items:flex-start;flex-direction:column;gap:4px}
 }
-@media(max-width:450px) {
- .inputs {gap:8px}
- .field label {font-size:11px;min-height:27px}
- .field input {height:44px;padding:0 9px;font-size:16px}
- .input-note {font-size:10px}
- .toolbar {align-items:flex-start}
- .location {font-size:12px}
+@media(max-width:380px) {
+  .inputs {grid-template-columns:1fr;gap:12px}
+  .field label {min-height:0}
+  .field input {height:46px}
 }
 @media print {
- body {padding:0;background:#fff}
- .container {max-width:100%}
- .header {background:#102344!important;color:#fff!important;box-shadow:none}
- .card {box-shadow:none;break-inside:avoid}
- .no-print,.loc-actions {display:none!important}
- .shift {break-inside:avoid}
- .shift-head {background:#f1f4fa!important}
+  body {padding:0;background:#fff}
+  .container {width:100%}
+  .header {padding:18px 22px;border-radius:0;background:#142b4d!important;box-shadow:none;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .card {margin-top:12px;padding:15px;box-shadow:none;break-inside:avoid}
+  .no-print {display:none!important}
+  .shift {break-inside:avoid}
 }
 </style>
 </head>
@@ -101,136 +90,109 @@ button.primary:hover {background:#194bc9}
 <div class="container">
   <header class="header">
     <p class="eyebrow">SOB Operation</p>
-    <h1>Staff Strength &amp; Daily Roster Planner</h1>
-    <p>Plan shift coverage around the staff available today.</p>
+    <h1>Daily Staff Roster</h1>
+    <p>Enter today's staff numbers. The available-location list updates automatically.</p>
   </header>
 
   <main>
     <section class="card" aria-labelledby="staff-heading">
-      <div class="section-heading">
-        <span class="section-number" aria-hidden="true">01</span>
-        <div>
-          <h2 id="staff-heading">Today's staff strength</h2>
-          <p>Update the numbers below to recalculate the roster instantly.</p>
-        </div>
-      </div>
+      <h2 class="card-heading" id="staff-heading">Today's staff</h2>
+      <p class="card-description">Change any number to update the roster.</p>
       <div class="inputs">
         <div class="field">
-          <label for="total">Total staff strength</label>
+          <label for="total">Total staff</label>
           <input id="total" type="number" min="0" step="1" value="39" inputmode="numeric">
-          <p class="input-note">On the team</p>
         </div>
         <div class="field">
-          <label for="wo">Week offs (WO)</label>
+          <label for="wo">Week offs</label>
           <input id="wo" type="number" min="0" step="1" value="7" inputmode="numeric">
-          <p class="input-note">Staff on weekly off</p>
         </div>
         <div class="field">
           <label for="leave">Leaves</label>
           <input id="leave" type="number" min="0" step="1" value="2" inputmode="numeric">
-          <p class="input-note">Staff on leave</p>
         </div>
       </div>
-    </section>
-
-    <section class="card" aria-labelledby="overview-heading">
-      <div class="section-heading">
-        <span class="section-number" aria-hidden="true">02</span>
-        <div>
-          <h2 id="overview-heading">Availability overview</h2>
-          <p>Coverage is based on total staff minus week offs and leaves.</p>
-        </div>
-      </div>
-      <div class="stats" aria-live="polite">
-        <div class="stat total"><strong class="value" id="sTotal">39</strong><span class="label">Total staff</span></div>
-        <div class="stat absent"><strong class="value" id="sAbsent">9</strong><span class="label">WO + leave</span></div>
-        <div class="stat available"><strong class="value" id="sAvailable">30</strong><span class="label">Available today</span></div>
-        <div class="stat covered"><strong class="value" id="sRequired">30</strong><span class="label">Locations covered</span></div>
-      </div>
-      <div class="status" id="status" role="status" aria-live="polite">
-        <span class="status-icon" aria-hidden="true">✓</span><span>Roster calculated from available staffing.</span>
+      <div class="availability" aria-live="polite">
+        <span class="availability-label">Staff available today</span>
+        <strong class="availability-value" id="sAvailable">30</strong>
       </div>
     </section>
 
     <section class="card" aria-labelledby="roster-heading">
-      <div class="toolbar">
-        <div class="heading-inline">
-          <span class="section-number" aria-hidden="true">03</span>
-          <div>
-            <h2 id="roster-heading">Locations staffed today</h2>
-            <p class="help-text">The list updates automatically based on the staff available.</p>
-          </div>
+      <div class="roster-heading">
+        <div>
+          <h2 class="card-heading" id="roster-heading">Locations staffed today</h2>
+          <p class="card-description">Locations are removed in priority order when staffing is short.</p>
         </div>
       </div>
-      <div id="roster"></div>
-      <div id="notStaffed" class="not-staffed" hidden></div>
-    </section>
-
-    <section class="card no-print">
-      <div class="actions">
-        <button class="primary" type="button" onclick="window.print()">Print roster</button>
+      <div id="roster" class="shifts"></div>
+      <div id="notStaffed" class="notice" role="status" aria-live="polite" hidden></div>
+      <div class="roster-actions no-print">
+        <button type="button" onclick="window.print()">Print roster</button>
       </div>
     </section>
   </main>
-  <footer class="footer">SOB OPERATION &nbsp;·&nbsp; STAFF PLANNING SYSTEM</footer>
+  <footer class="footer">SOB OPERATION · STAFF PLANNING</footer>
 </div>
 
 <script>
-const defaultShifts = [
+const shifts = [
   {name:"OPENING SHIFT",time:"9:30 AM – 6:30 PM",locations:["280 FT","POS 1"]},
   {name:"SECOND SHIFT",time:"10:00 AM – 7:00 PM",locations:["Group Counter","SGF","270 FT","Upgrade (Steps)","NAM 1","NAM 2","WOK 1","WOK 2"]},
   {name:"THIRD SHIFT",time:"11:00 AM – 8:00 PM",locations:["POS 2","POS 3","GF POS 1","GF POS 2","Divyanubhuti","NAM 3","WOK 3"]},
   {name:"CLOSING SHIFT",time:"12:30 PM – 9:30 PM",locations:["280 FT","270 FT","Upgrade (Steps)","POS 4","SGF","Sangam","VIP Gate","L&F","NAM 4","NAM 5","NAM 6","WOK 4","WOK 5","WOK 6"]}
 ];
 
-function getInputs() {
-  const read = id => {
-    const value = Number(document.getElementById(id).value);
-    return Number.isFinite(value) ? Math.max(0,Math.floor(value)) : 0;
-  };
-  const total = read("total");
-  const wo = read("wo");
-  const leave = read("leave");
-  return {total,wo,leave,available:Math.max(0,total-wo-leave),excessAbsences:Math.max(0,wo+leave-total)};
+// When staffing is short, these locations are left uncovered first.
+const removalPriority = ["NAM 6", "WOK 6"];
+
+function readInput(id) {
+  const value = Number(document.getElementById(id).value);
+  return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 }
 
 function render() {
-  const data = getInputs();
-  const locations = defaultShifts.flatMap(shift => shift.locations.map(name => ({name,shift})));
-  const coveredCount = Math.min(data.available,locations.length);
-  const coveredLocations = locations.slice(0,coveredCount);
-  const uncoveredLocations = locations.slice(coveredCount);
+  const total = readInput("total");
+  const weekOffs = readInput("wo");
+  const leaves = readInput("leave");
+  const available = Math.max(0, total - weekOffs - leaves);
+  const locations = shifts.flatMap(shift => shift.locations.map(name => ({name, shift})));
+  const uncoveredCount = Math.max(0, locations.length - available);
+  const priorityRank = name => {
+    const rank = removalPriority.indexOf(name);
+    return rank === -1 ? removalPriority.length : rank;
+  };
+  const removalOrder = [...locations].sort((a, b) =>
+    priorityRank(a.name) - priorityRank(b.name) || locations.indexOf(b) - locations.indexOf(a)
+  );
+  const uncovered = removalOrder.slice(0, uncoveredCount);
+  const uncoveredSet = new Set(uncovered);
 
-  document.getElementById("sTotal").textContent = data.total;
-  document.getElementById("sAbsent").textContent = data.wo+data.leave;
-  document.getElementById("sAvailable").textContent = data.available;
-  document.getElementById("sRequired").textContent = coveredCount;
-
-  const status = document.getElementById("status");
-  status.className = data.excessAbsences > 0 ? "status error" : uncoveredLocations.length > 0 ? "status warning" : "status";
-  const statusText = data.excessAbsences > 0
-    ? "Week offs and leaves exceed total staff by " + data.excessAbsences + ". No staff are available."
-    : uncoveredLocations.length > 0
-      ? coveredCount + " of " + locations.length + " locations can be staffed today."
-      : "All " + locations.length + " locations can be staffed today.";
-  status.innerHTML = '<span class="status-icon" aria-hidden="true">'+(data.excessAbsences > 0 || uncoveredLocations.length > 0 ? "!" : "✓")+'</span><span>'+statusText+'</span>';
-
-  document.getElementById("roster").innerHTML = defaultShifts.map(shift => {
-    const names = coveredLocations.filter(item => item.shift === shift).map(item => '<span class="location">'+item.name+'</span>').join("");
-    return '<section class="shift" aria-label="'+shift.name+'"><div class="shift-head"><span class="shift-title">'+shift.name+'</span><span class="shift-time">'+shift.time+'</span></div><div class="location-list">'+(names || '<span class="help-text">No locations staffed in this shift.</span>')+'</div></section>';
+  document.getElementById("sAvailable").textContent = available;
+  document.getElementById("roster").innerHTML = shifts.map(shift => {
+    const staffed = locations.filter(item => item.shift === shift && !uncoveredSet.has(item));
+    const list = staffed.length
+      ? '<ul class="location-list">' + staffed.map(item => '<li>' + item.name + '</li>').join("") + '</ul>'
+      : '<p class="empty-shift">No locations staffed in this shift.</p>';
+    return '<section class="shift" aria-label="' + shift.name + '"><div class="shift-header"><span class="shift-name">' + shift.name + '</span><span class="shift-time">' + shift.time + '</span></div>' + list + '</section>';
   }).join("");
 
   const notStaffed = document.getElementById("notStaffed");
-  notStaffed.hidden = uncoveredLocations.length === 0;
-  notStaffed.innerHTML = uncoveredLocations.length
-    ? '<strong>Not staffed today ('+uncoveredLocations.length+')</strong>'+uncoveredLocations.map(item => item.name).join(", ")
-    : "";
+  const excessAbsences = Math.max(0, weekOffs + leaves - total);
+  notStaffed.hidden = uncovered.length === 0 && excessAbsences === 0;
+  notStaffed.className = uncovered.length || excessAbsences ? "notice warning" : "notice";
+  if (excessAbsences > 0) {
+    notStaffed.innerHTML = '<strong>Week offs and leaves exceed total staff by ' + excessAbsences + '.</strong>No staff are available for the roster.';
+  } else if (uncovered.length > 0) {
+    notStaffed.innerHTML = '<strong>Not staffed (' + uncovered.length + ')</strong><ul>' + uncovered.map(item => '<li>' + item.name + ' · ' + item.shift.name + '</li>').join("") + '</ul>';
+  } else {
+    notStaffed.innerHTML = '';
+  }
 }
 
-["total","wo","leave"].forEach(id => {
-  document.getElementById(id).addEventListener("input",render);
+["total", "wo", "leave"].forEach(id => {
+  document.getElementById(id).addEventListener("input", render);
 });
-
 render();
 </script>
 </body>
