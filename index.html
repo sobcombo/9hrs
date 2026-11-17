@@ -17,7 +17,7 @@
     <link
       rel="icon"
       type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='19' cy='32' r='15' fill='%23fff' stroke='%23142b4d' stroke-width='4'/%3E%3Cpath d='M19 22v10l-7 5' fill='none' stroke='%23315fe8' stroke-linecap='round' stroke-linejoin='round' stroke-width='3'/%3E%3Ctext x='38' y='44' fill='%23142b4d' font-family='Arial,sans-serif' font-size='35' font-weight='700'%3E9%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23315b91'/%3E%3Ctext x='32' y='48' fill='%23fff' font-family='Arial,sans-serif' font-size='46' font-weight='700' text-anchor='middle'%3E9%3C/text%3E%3C/svg%3E"
     >
 
     <style>
@@ -105,16 +105,53 @@
         font-weight: 750;
       }
 
+      .number-control {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) 34px;
+        align-items: stretch;
+      }
+
+      .number-control button {
+        border: 1px solid var(--line);
+        background: #f8f9fc;
+        color: var(--navy);
+        font-size: 20px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .number-control button:first-child {
+        border-radius: 9px 0 0 9px;
+      }
+
+      .number-control button:last-child {
+        border-radius: 0 9px 9px 0;
+      }
+
+      .number-control button:hover {
+        background: var(--blue-soft);
+      }
+
+      .number-control button:focus-visible {
+        position: relative;
+        z-index: 1;
+        outline: 3px solid rgba(49, 95, 232, .25);
+        outline-offset: 1px;
+      }
+
       .field input {
         width: 100%;
         height: 45px;
-        padding: 0 12px;
+        padding: 0 8px;
         border: 1px solid var(--line);
-        border-radius: 9px;
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
         background: #fff;
         color: var(--ink);
         font-size: 17px;
         font-weight: 750;
+        text-align: center;
       }
 
       .field input:focus {
@@ -281,6 +318,31 @@
         padding: 2px 0;
       }
 
+      .print-sheet {
+        display: none;
+      }
+
+      .print-button {
+        display: block;
+        margin: 14px auto 0;
+        padding: 11px 20px;
+        border: 0;
+        border-radius: 9px;
+        background: var(--blue);
+        color: #fff;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .print-button:hover {
+        background: #244cc4;
+      }
+
+      .print-button:focus-visible {
+        outline: 3px solid rgba(49, 95, 232, .3);
+        outline-offset: 3px;
+      }
+
       .footer {
         padding: 15px 8px 2px;
         color: var(--muted);
@@ -312,9 +374,13 @@
           font-size: 11px;
         }
 
+        .number-control {
+          grid-template-columns: 27px minmax(0, 1fr) 27px;
+        }
+
         .field input {
           height: 43px;
-          padding: 0 8px;
+          padding: 0 4px;
           font-size: 16px;
         }
 
@@ -340,34 +406,135 @@
       }
 
       /* Print layout */
+      @page {
+        size: A4 portrait;
+        margin: 12mm;
+      }
+
       @media print {
+        @page {
+          size: A4 portrait;
+          margin: 9mm;
+        }
+
         body {
           padding: 0;
           background: #fff;
+          color: #18263b;
         }
 
         .container {
           width: 100%;
+          margin: 0;
         }
 
-        .header {
-          padding: 14px 18px;
-          border-radius: 0;
-          background: #142b4d !important;
-          box-shadow: none;
+        .container > :not(.print-sheet) {
+          display: none !important;
+        }
+
+        .print-sheet {
+          display: block;
+        }
+
+        .print-title {
+          width: fit-content;
+          margin: 0 auto 8px;
+          padding-bottom: 3px;
+          border-bottom: 1px solid #142b4d;
+          color: #142b4d;
+          font-size: 18px;
+          text-align: center;
           print-color-adjust: exact;
           -webkit-print-color-adjust: exact;
         }
 
-        .card {
-          margin-top: 10px;
-          padding: 12px;
-          box-shadow: none;
+        .print-summary {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 5px;
+          margin-bottom: 9px;
+        }
+
+        .print-summary span {
+          padding: 5px 3px;
+          border: 1px solid #dce2eb;
+          border-radius: 4px;
+          font-size: 10px;
+          font-weight: 700;
+          text-align: center;
+        }
+
+        .print-shifts {
+          display: block;
+        }
+
+        .print-shift {
+          overflow: hidden;
+          margin-bottom: 5px;
+          border: 1px solid #cfd6e1;
           break-inside: avoid;
         }
 
-        .shift {
-          break-inside: avoid;
+        .print-shift:last-child {
+          margin-bottom: 0;
+        }
+
+        .print-shift h2 {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          margin: 0;
+          padding: 5px 8px;
+          background: #eef1f6 !important;
+          font-size: 11px;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+
+        .print-shift h2 span:first-child {
+          display: inline-block;
+          align-self: center;
+          padding-bottom: 3px;
+          border-bottom: 1px solid #142b4d;
+        }
+
+        .print-shift h2 span:last-child {
+          text-align: right;
+          white-space: nowrap;
+        }
+
+        .print-shift ul {
+          display: block;
+          margin: 0;
+          padding: 0 8px;
+          list-style: none;
+        }
+
+        .print-shift li {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          align-items: center;
+          gap: 10px;
+          min-height: 19px;
+          padding: 3px 0;
+          border-bottom: 1px solid #edf0f4;
+          font-size: 11px;
+          line-height: 1.25;
+        }
+
+        .print-location-name {
+          font-weight: 700;
+        }
+
+        .print-location-category {
+          color: #59677b;
+          text-align: center;
+        }
+
+        .print-staff-name {
+          min-height: 13px;
+          border-bottom: 1px dotted #b8c0cc;
         }
       }
     </style>
@@ -384,41 +551,53 @@
           <div class="inputs">
             <div class="field">
               <label for="total">Total staff</label>
-              <input
-                id="total"
-                type="number"
-                min="0"
-                step="1"
-                value="39"
-                inputmode="numeric"
-              >
+              <div class="number-control">
+                <button type="button" data-step="-1" data-target="total" aria-label="Decrease total staff">−</button>
+                <input
+                  id="total"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value="39"
+                  inputmode="numeric"
+                >
+                <button type="button" data-step="1" data-target="total" aria-label="Increase total staff">+</button>
+              </div>
             </div>
 
             <div class="field">
               <label for="wo">Week offs</label>
-              <input
-                id="wo"
-                type="number"
-                min="0"
-                step="1"
-                value="7"
-                inputmode="numeric"
-                aria-describedby="woWarning"
-              >
+              <div class="number-control">
+                <button type="button" data-step="-1" data-target="wo" aria-label="Decrease week offs">−</button>
+                <input
+                  id="wo"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value="7"
+                  inputmode="numeric"
+                  aria-describedby="woWarning"
+                >
+                <button type="button" data-step="1" data-target="wo" aria-label="Increase week offs">+</button>
+              </div>
               <span class="field-warning" id="woWarning" aria-live="polite"></span>
             </div>
 
             <div class="field">
               <label for="leave">Leaves</label>
-              <input
-                id="leave"
-                type="number"
-                min="0"
-                step="1"
-                value="2"
-                inputmode="numeric"
-                aria-describedby="leaveWarning"
-              >
+              <div class="number-control">
+                <button type="button" data-step="-1" data-target="leave" aria-label="Decrease leaves">−</button>
+                <input
+                  id="leave"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value="2"
+                  inputmode="numeric"
+                  aria-describedby="leaveWarning"
+                >
+                <button type="button" data-step="1" data-target="leave" aria-label="Increase leaves">+</button>
+              </div>
               <span class="field-warning" id="leaveWarning" aria-live="polite"></span>
             </div>
           </div>
@@ -441,7 +620,14 @@
         </section>
       </main>
 
+      <button class="print-button" id="printRoster" type="button">Print roster</button>
       <footer class="footer">SOB OPERATION · STAFF PLANNING</footer>
+
+      <section class="print-sheet" aria-label="Printable complete roster">
+        <h1 class="print-title">SOB: 9 Hrs. Daily OAs' Roster</h1>
+        <div class="print-summary" id="printSummary"></div>
+        <div class="print-shifts" id="printShifts"></div>
+      </section>
     </div>
 
     <script>
@@ -549,6 +735,70 @@
         `;
       }
 
+      // Return only locations assigned to the currently available staff.
+      function getStaffedLocations(available) {
+        if (available <= 26) return [];
+
+        const coreCount = Math.min(available, coreLocations.length);
+        const extras = additionalLocations.slice(
+          0,
+          Math.max(0, available - coreLocations.length)
+        );
+        const locations = [
+          ...coreLocations.slice(0, coreCount),
+          ...extras
+        ].map(item => ({ ...item }));
+        const namCount = locations.filter(item => item.name.startsWith("NAM ")).length;
+        const wokCount = locations.filter(item => item.name.startsWith("WOK ")).length;
+
+        if (namCount >= 7) {
+          const namFour = locations.find(item => item.name === "NAM 4");
+          if (namFour) namFour.shift = 2;
+        }
+
+        if (wokCount >= 7) {
+          const wokFour = locations.find(item => item.name === "WOK 4");
+          if (wokFour) wokFour.shift = 2;
+        }
+
+        if (locations.some(item => item.name === "POS 5")) {
+          const posFour = locations.find(item => item.name === "POS 4");
+          if (posFour) posFour.shift = 2;
+        }
+
+        return locations;
+      }
+
+      // Build a print roster containing the same assigned locations as the screen.
+      function renderPrintRoster(total, weekOffs, leaves, available, locations) {
+        document.getElementById("printSummary").innerHTML = `
+          <span>Total staff: ${total}</span>
+          <span>Week offs: ${weekOffs}</span>
+          <span>Leaves: ${leaves}</span>
+          <span>Available: ${available}</span>
+        `;
+
+        document.getElementById("printShifts").innerHTML = shifts
+          .map((shift, shiftIndex) => {
+            const staffed = locations
+              .filter(item => item.shift === shiftIndex)
+              .sort(
+                (a, b) =>
+                  categoryOrder.indexOf(categoryFor(a.name)) -
+                  categoryOrder.indexOf(categoryFor(b.name))
+              );
+            const list = staffed
+              .map(item => `<li><span class="print-location-name">${item.name}</span><span class="print-location-category">${categoryFor(item.name)}</span><span class="print-staff-name" aria-hidden="true"></span></li>`)
+              .join("");
+
+            return `<section class="print-shift">
+              <h2><span>${shift.name} [${shift.time}]</span><span>${staffed.length} STAFF</span></h2>
+              <ul>${list}</ul>
+            </section>`;
+          })
+          .join("");
+      }
+
       // Recalculate availability and rebuild the roster.
       function render() {
         const total = readInput("total");
@@ -557,12 +807,14 @@
         const available = Math.max(0, total - weekOffs - leaves);
         const roster = document.getElementById("roster");
         const notStaffed = document.getElementById("notStaffed");
+        const staffedLocations = getStaffedLocations(available);
         const absenceWarning = total >= 27
           ? `Too many combined absences. Keep week offs and leaves to ${total - 27} or fewer to have 27 staff available.`
           : "At least 27 total staff are needed. Reduce absences or increase total staff.";
         const showAbsenceWarning = available < 27;
 
         document.getElementById("sAvailable").textContent = available;
+        renderPrintRoster(total, weekOffs, leaves, available, staffedLocations);
         document.getElementById("woWarning").textContent = showAbsenceWarning
           ? absenceWarning
           : "";
@@ -578,40 +830,10 @@
         }
 
         const staffedCoreCount = Math.min(available, coreLocations.length);
-        const staffedExtras = additionalLocations.slice(
-          0,
-          Math.max(0, available - coreLocations.length)
-        );
-        const staffedLocations = [
-          ...coreLocations.slice(0, staffedCoreCount),
-          ...staffedExtras
-        ].map(item => ({ ...item }));
-
-        const namCount = staffedLocations.filter(
-          item => item.name.startsWith("NAM ")
-        ).length;
-        const wokCount = staffedLocations.filter(
-          item => item.name.startsWith("WOK ")
-        ).length;
-
-        if (namCount >= 7) {
-          const namFour = staffedLocations.find(item => item.name === "NAM 4");
-          if (namFour) namFour.shift = 2;
-        }
-
-        if (wokCount >= 7) {
-          const wokFour = staffedLocations.find(item => item.name === "WOK 4");
-          if (wokFour) wokFour.shift = 2;
-        }
-
-        if (staffedLocations.some(item => item.name === "POS 5")) {
-          const posFour = staffedLocations.find(item => item.name === "POS 4");
-          if (posFour) posFour.shift = 2;
-        }
-
+        const staffedExtraCount = Math.max(0, available - coreLocations.length);
         const uncoveredLocations = [
           ...coreLocations.slice(staffedCoreCount),
-          ...additionalLocations.slice(staffedExtras.length)
+          ...additionalLocations.slice(staffedExtraCount)
         ];
 
         roster.innerHTML = shifts
@@ -667,6 +889,19 @@
       // Update the roster whenever staffing numbers change.
       ["total", "wo", "leave"].forEach(id => {
         document.getElementById(id).addEventListener("input", render);
+      });
+
+      document.querySelectorAll(".number-control button").forEach(button => {
+        button.addEventListener("click", () => {
+          const input = document.getElementById(button.dataset.target);
+          const nextValue = Math.max(0, readInput(input.id) + Number(button.dataset.step));
+          input.value = nextValue;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+      });
+
+      document.getElementById("printRoster").addEventListener("click", () => {
+        window.print();
       });
 
       render();
