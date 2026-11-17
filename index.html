@@ -318,13 +318,20 @@
         padding: 2px 0;
       }
 
-      .print-sheet {
+      .print-sheet,
+      .multiple-print-sheet {
         display: none;
+      }
+
+      .print-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
       }
 
       .print-button {
         display: block;
-        margin: 14px auto 0;
+        margin: 14px 0 0;
         padding: 11px 20px;
         border: 0;
         border-radius: 9px;
@@ -536,6 +543,74 @@
           min-height: 13px;
           border-bottom: 1px dotted #b8c0cc;
         }
+
+        body.multiple-print .container > :not(.multiple-print-sheet) {
+          display: none !important;
+        }
+
+        body.multiple-print .print-sheet {
+          display: none !important;
+        }
+
+        body.multiple-print .multiple-print-sheet {
+          display: block;
+        }
+
+        .multiple-print-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          margin-top: 8px;
+          border-top: 1px solid #cfd6e1;
+          border-bottom: 1px solid #cfd6e1;
+        }
+
+        .multiple-print-column {
+          min-width: 0;
+          padding: 5px 6px;
+          border-left: 1px solid #cfd6e1;
+          break-inside: avoid;
+        }
+
+        .multiple-print-column:last-child {
+          border-right: 1px solid #cfd6e1;
+        }
+
+        .multiple-print-column h2 {
+          margin: 0 0 5px;
+          padding: 0 0 4px;
+          border-bottom: 1px solid #dce2eb;
+          color: #142b4d;
+          font-size: 10px;
+          text-align: center;
+        }
+
+        .multiple-print-shift {
+          margin-top: 5px;
+        }
+
+        .multiple-print-shift h3 {
+          margin: 0;
+          padding: 2px 0;
+          background: #eef1f6 !important;
+          font-size: 9px;
+          text-align: center;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+
+        .multiple-print-shift ul {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .multiple-print-shift li {
+          padding: 2px 1px;
+          border-bottom: 1px solid #edf0f4;
+          font-size: 9px;
+          line-height: 1.2;
+          overflow-wrap: anywhere;
+        }
       }
     </style>
   </head>
@@ -550,7 +625,7 @@
         <section class="card" aria-label="Staff numbers">
           <div class="inputs">
             <div class="field">
-              <label for="total">Total staff</label>
+              <label for="total">Total Staff</label>
               <div class="number-control">
                 <button type="button" data-step="-1" data-target="total" aria-label="Decrease total staff">−</button>
                 <input
@@ -620,13 +695,21 @@
         </section>
       </main>
 
-      <button class="print-button" id="printRoster" type="button">Print roster</button>
+      <div class="print-actions">
+        <button class="print-button" id="printRoster" type="button">Print Roster</button>
+        <button class="print-button" id="printMultiple" type="button">Print Multiple</button>
+      </div>
       <footer class="footer">SOB OPERATION · STAFF PLANNING</footer>
 
       <section class="print-sheet" aria-label="Printable complete roster">
         <h1 class="print-title">SOB: 9 Hrs. Daily OAs' Roster</h1>
         <div class="print-summary" id="printSummary"></div>
         <div class="print-shifts" id="printShifts"></div>
+      </section>
+
+      <section class="multiple-print-sheet" aria-label="Printable rosters for 27 to 30 available staff">
+        <h1 class="print-title">SOB: 9 Hrs. Daily OAs' Roster</h1>
+        <div class="multiple-print-grid" id="multiplePrintGrid"></div>
       </section>
     </div>
 
@@ -772,7 +855,7 @@
       // Build a print roster containing the same assigned locations as the screen.
       function renderPrintRoster(total, weekOffs, leaves, available, locations) {
         document.getElementById("printSummary").innerHTML = `
-          <span>Total staff: ${total}</span>
+          <span>Total Staff: ${total}</span>
           <span>Week offs: ${weekOffs}</span>
           <span>Leaves: ${leaves}</span>
           <span>Available: ${available}</span>
@@ -799,6 +882,31 @@
           .join("");
       }
 
+      // Build four compact print columns for 27 through 30 available staff.
+      function renderMultiplePrintRoster() {
+        document.getElementById("multiplePrintGrid").innerHTML = [27, 28, 29, 30]
+          .map(available => {
+            const locations = getStaffedLocations(available);
+            const shiftBlocks = shifts
+              .map((shift, shiftIndex) => {
+                const staffed = locations.filter(item => item.shift === shiftIndex);
+                if (staffed.length === 0) return "";
+
+                return `<section class="multiple-print-shift">
+                  <h3>${shift.time}</h3>
+                  <ul>${staffed.map(item => `<li>${item.name}</li>`).join("")}</ul>
+                </section>`;
+              })
+              .join("");
+
+            return `<article class="multiple-print-column">
+              <h2>Total Staff: ${available}</h2>
+              ${shiftBlocks}
+            </article>`;
+          })
+          .join("");
+      }
+
       // Recalculate availability and rebuild the roster.
       function render() {
         const total = readInput("total");
@@ -815,6 +923,7 @@
 
         document.getElementById("sAvailable").textContent = available;
         renderPrintRoster(total, weekOffs, leaves, available, staffedLocations);
+        renderMultiplePrintRoster();
         document.getElementById("woWarning").textContent = showAbsenceWarning
           ? absenceWarning
           : "";
@@ -901,7 +1010,17 @@
       });
 
       document.getElementById("printRoster").addEventListener("click", () => {
+        document.body.classList.remove("multiple-print");
         window.print();
+      });
+
+      document.getElementById("printMultiple").addEventListener("click", () => {
+        document.body.classList.add("multiple-print");
+        window.print();
+      });
+
+      window.addEventListener("afterprint", () => {
+        document.body.classList.remove("multiple-print");
       });
 
       render();
