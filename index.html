@@ -435,7 +435,7 @@
           margin: 0;
         }
 
-        .container > :not(.print-sheet) {
+        .container > :not(.print-sheet):not(.multiple-print-sheet) {
           display: none !important;
         }
 
@@ -585,7 +585,7 @@
         }
 
         .multiple-print-shift {
-          margin-top: 5px;
+          margin-top: 10px;
         }
 
         .multiple-print-shift h3 {
@@ -607,7 +607,9 @@
         .multiple-print-shift li {
           padding: 2px 1px;
           border-bottom: 1px solid #edf0f4;
+          color: #000;
           font-size: 9px;
+          font-weight: 700;
           line-height: 1.2;
           overflow-wrap: anywhere;
         }
@@ -893,7 +895,7 @@
                 if (staffed.length === 0) return "";
 
                 return `<section class="multiple-print-shift">
-                  <h3>${shift.time}</h3>
+                  <h3>${shift.time} [${staffed.length} staff]</h3>
                   <ul>${staffed.map(item => `<li>${item.name}</li>`).join("")}</ul>
                 </section>`;
               })
