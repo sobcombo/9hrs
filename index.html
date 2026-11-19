@@ -525,7 +525,6 @@
           gap: 10px;
           min-height: 19px;
           padding: 3px 0;
-          border-bottom: 1px solid #edf0f4;
           font-size: 11px;
           line-height: 1.25;
         }
@@ -562,35 +561,33 @@
           margin-top: 8px;
           border-top: 1px solid #cfd6e1;
           border-bottom: 1px solid #cfd6e1;
+          break-inside: avoid;
         }
 
-        .multiple-print-column {
+        .multiple-print-column,
+        .multiple-print-cell {
           min-width: 0;
-          padding: 5px 6px;
+          padding: 3px 6px;
           border-left: 1px solid #cfd6e1;
           break-inside: avoid;
         }
 
-        .multiple-print-column:last-child {
+        .multiple-print-cell:nth-child(4n),
+        .multiple-print-column:nth-child(4) {
           border-right: 1px solid #cfd6e1;
         }
 
         .multiple-print-column h2 {
-          margin: 0 0 5px;
+          margin: 0;
           padding: 0 0 4px;
-          border-bottom: 1px solid #dce2eb;
           color: #142b4d;
           font-size: 10px;
           text-align: center;
         }
 
-        .multiple-print-shift {
-          margin-top: 10px;
-        }
-
         .multiple-print-shift h3 {
-          margin: 0;
-          padding: 2px 0;
+          margin: 0 0 3px;
+          padding: 9px 0;
           background: #eef1f6 !important;
           font-size: 9px;
           text-align: center;
@@ -606,7 +603,6 @@
 
         .multiple-print-shift li {
           padding: 2px 1px;
-          border-bottom: 1px solid #edf0f4;
           color: #000;
           font-size: 9px;
           font-weight: 700;
@@ -721,7 +717,8 @@
         { name: "FIRST SHIFT", time: "09:30 - 06:30" },
         { name: "SECOND SHIFT", time: "10:00 - 07:00" },
         { name: "THIRD SHIFT", time: "11:00 - 08:00" },
-        { name: "FOURTH SHIFT", time: "12:30 - 09:30" }
+        { name: "FOURTH SHIFT", time: "12:30 - 09:30" },
+        { name: "FIFTH SHIFT", time: "01:00 - 10:00" }
       ];
 
       // Core posts are staffed first; additional posts open one at a time.
@@ -745,7 +742,7 @@
         { name: "270 ft", shift: 3 },
         { name: "Upgrade (Steps)", shift: 3 },
         { name: "SGF 2", shift: 3 },
-        { name: "L&F", shift: 3 },
+        { name: "L&F", shift: 4 },
         { name: "VIP Gate", shift: 3 },
         { name: "NAM 3", shift: 2 },
         { name: "NAM 4", shift: 3 },
@@ -759,7 +756,7 @@
       const additionalLocations = [
         { name: "WOK 6", shift: 3 },
         { name: "POS 4", shift: 3 },
-        { name: "Sangam", shift: 3 },
+        { name: "Sangam", shift: 4 },
         { name: "NAM 6", shift: 3 },
         { name: "SGF 3", shift: 3 },
         { name: "WOK 7", shift: 3 },
@@ -779,6 +776,37 @@
         "World of Krishna",
         "Park"
       ];
+
+      const ticketCounterOrder = [
+        "POS 2",
+        "POS 3",
+        "POS 4",
+        "GF POS 1",
+        "GF POS 2",
+        "POS 5",
+        "POS 6",
+        "POS 7",
+        "POS 8",
+        "POS 1",
+        "Group Counter",
+        "L&F"
+      ];
+
+      function compareLocations(a, b) {
+        const categoryDifference =
+          categoryOrder.indexOf(categoryFor(a.name)) -
+          categoryOrder.indexOf(categoryFor(b.name));
+
+        if (categoryDifference !== 0) return categoryDifference;
+        if (categoryFor(a.name) !== "Ticket Counter") return 0;
+
+        const priority = name => {
+          const index = ticketCounterOrder.indexOf(name);
+          return index === -1 ? ticketCounterOrder.length : index;
+        };
+
+        return priority(a.name) - priority(b.name);
+      }
 
       // Read a non-negative whole-number value from an input.
       function readInput(id) {
@@ -846,6 +874,11 @@
           if (wokFour) wokFour.shift = 2;
         }
 
+        if (available <= 28) {
+          const posThree = locations.find(item => item.name === "POS 3");
+          if (posThree) posThree.shift = 3;
+        }
+
         if (locations.some(item => item.name === "POS 5")) {
           const posFour = locations.find(item => item.name === "POS 4");
           if (posFour) posFour.shift = 2;
@@ -867,11 +900,7 @@
           .map((shift, shiftIndex) => {
             const staffed = locations
               .filter(item => item.shift === shiftIndex)
-              .sort(
-                (a, b) =>
-                  categoryOrder.indexOf(categoryFor(a.name)) -
-                  categoryOrder.indexOf(categoryFor(b.name))
-              );
+              .sort(compareLocations);
             const list = staffed
               .map(item => `<li><span class="print-location-name">${item.name}</span><span class="print-location-category">${categoryFor(item.name)}</span><span class="print-staff-name" aria-hidden="true"></span></li>`)
               .join("");
@@ -884,29 +913,31 @@
           .join("");
       }
 
-      // Build four compact print columns for 27 through 30 available staff.
+      // Build a compact, row-aligned four-column print roster for 27–30 staff.
       function renderMultiplePrintRoster() {
-        document.getElementById("multiplePrintGrid").innerHTML = [27, 28, 29, 30]
-          .map(available => {
-            const locations = getStaffedLocations(available);
-            const shiftBlocks = shifts
-              .map((shift, shiftIndex) => {
-                const staffed = locations.filter(item => item.shift === shiftIndex);
-                if (staffed.length === 0) return "";
+        const availabilities = [27, 28, 29, 30];
+        const headers = availabilities
+          .map(available => `<article class="multiple-print-column"><h2>Total Staff: ${available}</h2></article>`)
+          .join("");
+        const shiftRows = shifts
+          .map((shift, shiftIndex) => availabilities
+            .map(available => {
+              const staffed = getStaffedLocations(available)
+                .filter(item => item.shift === shiftIndex)
+                .sort(compareLocations);
 
-                return `<section class="multiple-print-shift">
+              return `<section class="multiple-print-cell">
+                <div class="multiple-print-shift">
                   <h3>${shift.time} [${staffed.length} staff]</h3>
                   <ul>${staffed.map(item => `<li>${item.name}</li>`).join("")}</ul>
-                </section>`;
-              })
-              .join("");
-
-            return `<article class="multiple-print-column">
-              <h2>Total Staff: ${available}</h2>
-              ${shiftBlocks}
-            </article>`;
-          })
+                </div>
+              </section>`;
+            })
+            .join("")
+          )
           .join("");
+
+        document.getElementById("multiplePrintGrid").innerHTML = headers + shiftRows;
       }
 
       // Recalculate availability and rebuild the roster.
@@ -953,11 +984,7 @@
               item => item.shift === shiftIndex
             );
 
-            staffed.sort(
-              (a, b) =>
-                categoryOrder.indexOf(categoryFor(a.name)) -
-                categoryOrder.indexOf(categoryFor(b.name))
-            );
+            staffed.sort(compareLocations);
 
             const list = staffed.length
               ? `<ul class="location-list">${staffed.map(locationMarkup).join("")}</ul>`
